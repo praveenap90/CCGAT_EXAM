@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>CCAT Practice Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: exam-booklet single column; sticky timer bar, question card with a numbered navigator beside it on wide screens. */
+:root{
+  --bg:#F2F4F8; --surface:#FFFFFF; --ink:#151B26; --muted:#566074; --line:#D8DEE8;
+  --accent:#2347D9; --accent-ink:#FFFFFF; --accent-soft:#E3E9FD;
+  --warn:#B4540A; --warn-soft:#FDEBD8; --ok:#157A3C; --ok-soft:#DDF3E4; --bad:#B42318; --bad-soft:#FCE4E1;
+  --font-display:'Bricolage Grotesque','IBM Plex Sans',system-ui,sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E121A; --surface:#161C27; --ink:#E6EAF2; --muted:#9AA5B8; --line:#2A3342;
+    --accent:#8AA5FF; --accent-ink:#0E121A; --accent-soft:#1E2A52;
+    --warn:#F0A04B; --warn-soft:#3A2810; --ok:#4ADE80; --ok-soft:#10301D; --bad:#F87171; --bad-soft:#3B1717;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E121A; --surface:#161C27; --ink:#E6EAF2; --muted:#9AA5B8; --line:#2A3342;
+  --accent:#8AA5FF; --accent-ink:#0E121A; --accent-soft:#1E2A52;
+  --warn:#F0A04B; --warn-soft:#3A2810; --ok:#4ADE80; --ok-soft:#10301D; --bad:#F87171; --bad-soft:#3B1717;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--font-body);-webkit-text-size-adjust:100%}
+.wrap{max-width:68rem;margin:0 auto;padding-inline:16px;padding-block:28px 64px}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.eyebrow{font:500 .75rem/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* start */
+.hero{display:flex;flex-direction:column;gap:14px;margin-bottom:28px}
+.hero h1{font-size:clamp(2.1rem,6vw,3.4rem);line-height:1.05;font-weight:700}
+.lede{max-width:62ch;color:var(--muted);font-size:1.05rem}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:14px;margin-bottom:12px}
+.mode{display:flex;flex-direction:column;gap:6px;text-align:left;padding:18px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;min-width:0}
+.mode:hover{border-color:var(--accent)}
+.mode .big{font:500 2rem/1 var(--font-mono);font-variant-numeric:tabular-nums}
+.mode .name{font-weight:600}
+.mode .sub{color:var(--muted);font-size:.9rem}
+.note{color:var(--muted);font-size:.9rem;max-width:70ch}
+.tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:20px;margin-top:36px}
+.tips .card h2{font-size:1.25rem;margin-bottom:12px}
+.tips ul{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:10px}
+.tips li{padding-left:2px}
+.tips li strong{font-weight:600}
+.hist{margin-top:28px}
+.hist h2{font-size:1.05rem;margin-bottom:8px}
+.hist table{border-collapse:collapse;width:100%;max-width:30rem;font-size:.92rem}
+.hist td,.hist th{padding:6px 10px 6px 0;text-align:left;border-bottom:1px solid var(--line);font-weight:400}
+.hist th{color:var(--muted);font:500 .72rem/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;min-width:0}
+
+/* test */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line);margin-inline:-16px;padding-inline:16px}
+.bar-in{max-width:68rem;margin:0 auto;display:flex;align-items:center;gap:16px;padding-block:10px;flex-wrap:wrap}
+.qcount{white-space:nowrap}
+.prog{flex:1;min-width:7rem;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--accent);transition:width .2s}
+.clock{display:flex;align-items:baseline;gap:8px;padding:4px 10px;border-radius:8px}
+.clock .lbl{font:500 .7rem/1 var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.clock #clock{font-size:1.5rem;font-weight:500;line-height:1.2}
+.clock.low{background:var(--warn-soft);color:var(--warn)}
+.clock.low .lbl{color:var(--warn)}
+.test-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;margin-top:20px;align-items:start}
+@media (min-width:860px){.test-grid{grid-template-columns:minmax(0,1fr) 19rem}.side{position:sticky;top:5rem}}
+.qcard{padding:24px}
+.qmeta{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.chip{font:500 .72rem/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;padding:5px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent)}
+.chip.flag{background:var(--warn-soft);color:var(--warn)}
+.qtext{font-size:clamp(1.25rem,3.2vw,1.6rem);line-height:1.3;font-weight:600;margin-bottom:20px;overflow-wrap:anywhere}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:12px 14px;min-height:3.25rem;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt .key{flex:none;width:2rem;height:2rem;display:grid;place-items:center;border:1.5px solid var(--line);border-radius:6px;font:500 .9rem/1 var(--font-mono);color:var(--muted)}
+.opt .otext{min-width:0;overflow-wrap:anywhere}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.sel .key{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.qnav{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.qnav .grow{flex:1}
+.keys{margin-top:14px;color:var(--muted);font-size:.82rem}
+.btn{padding:.65rem 1.1rem;border-radius:8px;border:1.5px solid var(--line);background:transparent;font-weight:600;cursor:pointer}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.wide{width:100%}
+.btn[aria-pressed="true"]{border-color:var(--warn);color:var(--warn)}
+.side h2{font-size:1rem;margin-bottom:4px}
+.side .tally{color:var(--muted);font-size:.88rem;margin-bottom:12px}
+.navgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(2.4rem,1fr));gap:6px;margin-bottom:14px}
+.dot{height:2.4rem;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);font:500 .82rem/1 var(--font-mono);color:var(--muted);cursor:pointer;padding:0}
+.dot.ans{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.dot.fl{border-bottom:4px solid var(--warn)}
+.dot.cur{outline:2px solid var(--ink);outline-offset:1px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.78rem;color:var(--muted);margin-bottom:16px}
+.legend span::before{content:"";display:inline-block;width:.8rem;height:.8rem;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1.5px solid var(--line)}
+.legend .l-ans::before{background:var(--accent-soft);border-color:transparent}
+.legend .l-fl::before{border-bottom:4px solid var(--warn)}
+.auto{display:flex;gap:8px;align-items:center;font-size:.88rem;margin-bottom:14px}
+.auto input{width:1.1rem;height:1.1rem;accent-color:var(--accent)}
+.confirm{border:1.5px solid var(--warn);background:var(--warn-soft);border-radius:10px;padding:12px}
+.confirm p{margin-bottom:10px;font-weight:500}
+.confirm .row{display:flex;gap:8px;flex-wrap:wrap}
+
+/* results */
+.banner{padding:10px 14px;border-radius:8px;background:var(--warn-soft);color:var(--warn);font-weight:500;margin-bottom:16px}
+.res-top{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;margin-block:18px 24px}
+@media (min-width:760px){.res-top{grid-template-columns:auto minmax(0,1fr);align-items:center;gap:40px}}
+.score{display:flex;align-items:baseline;gap:10px}
+.score .num{font:700 clamp(4rem,14vw,6.5rem)/1 var(--font-display);font-variant-numeric:tabular-nums}
+.score .of{font:500 1.5rem/1 var(--font-mono);color:var(--muted)}
+.pct{color:var(--muted);margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(8rem,1fr));gap:0}
+.stat{padding:8px 16px;border-left:1px solid var(--line)}
+.stat:first-child{border-left:0;padding-left:0}
+.stat dt{font:500 .7rem/1 var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.stat dd{margin:0;font:500 1.5rem/1.1 var(--font-mono);font-variant-numeric:tabular-nums}
+.secs{display:flex;flex-direction:column;gap:14px;margin-top:6px}
+.srow{display:grid;grid-template-columns:7rem minmax(0,1fr) 5.5rem 5rem;gap:12px;align-items:center}
+.srow .nm{font-weight:600}
+.srow .track{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.srow .track i{display:block;height:100%;background:var(--accent)}
+.srow .sc,.srow .tm{font-size:.9rem;text-align:right}
+.srow .tm{color:var(--muted)}
+@media (max-width:520px){.srow{grid-template-columns:5.5rem minmax(0,1fr) 4rem}.srow .tm{display:none}}
+.coach{margin-top:16px;color:var(--muted);max-width:70ch}
+.coach strong{color:var(--ink)}
+.rv-head{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;margin:32px 0 14px}
+.rv-head h2{font-size:1.4rem}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{padding:.4rem .8rem;border-radius:999px;border:1.5px solid var(--line);background:transparent;font-size:.88rem;font-weight:500;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.rv{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.rv-top{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.st{font:500 .72rem/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;padding:5px 8px;border-radius:6px}
+.st.ok{background:var(--ok-soft);color:var(--ok)}
+.st.bad{background:var(--bad-soft);color:var(--bad)}
+.st.blank{background:var(--line);color:var(--muted)}
+.rv .qn{color:var(--muted);font-size:.85rem}
+.rv .t{margin-left:auto;color:var(--muted);font-size:.85rem}
+.rv .q{font-weight:600;overflow-wrap:anywhere}
+.ro{display:flex;flex-direction:column;gap:6px}
+.ro div{display:flex;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);font-size:.95rem}
+.ro .mk{flex:none;width:1.4rem;font-family:var(--font-mono);color:var(--muted)}
+.ro .ok{background:var(--ok-soft);border-color:transparent}
+.ro .ok .mk{color:var(--ok)}
+.ro .bad{background:var(--bad-soft);border-color:transparent}
+.ro .bad .mk{color:var(--bad)}
+.ro .tag{margin-left:auto;font-size:.78rem;color:var(--muted);white-space:nowrap}
+.exp{color:var(--muted);font-size:.93rem;border-top:1px solid var(--line);padding-top:10px}
+.exp b{color:var(--ink);font-weight:600}
+.res-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.foot{margin-top:36px;color:var(--muted);font-size:.85rem;max-width:70ch}
+/* tabs, answer key, tips */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:26px;overflow-x:auto}
+.tabs button{padding:.7rem 1rem;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;background:none;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
+.page-head{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.page-head h1{font-size:clamp(1.8rem,5vw,2.6rem);line-height:1.1;font-weight:700}
+.qk{display:grid;grid-template-columns:repeat(auto-fill,minmax(9.5rem,1fr));gap:6px 12px;margin:0 0 8px;padding:0;list-style:none}
+.qk li{display:flex;gap:8px;align-items:baseline;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);min-width:0;font-size:.92rem}
+.qk b{font:500 .8rem/1 var(--font-mono);color:var(--muted);min-width:1.4rem}
+.qk span{overflow-wrap:anywhere}
+.tipsec{display:flex;flex-direction:column;gap:20px;margin-bottom:20px}
+.tipsec h2{font-size:1.5rem}
+.tipsec h3{font-size:1.02rem;margin-bottom:8px}
+.tipsec ul{margin:0;padding-left:1.1rem;display:flex;flex-direction:column;gap:7px}
+.tipgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:22px}
+.refwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.ref{border-collapse:collapse;width:100%;font-size:.92rem}
+.ref th,.ref td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.ref tr:last-child td{border-bottom:0}
+.ref th{font:500 .72rem/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--bg)}
+.ref td:first-child{font-weight:600;min-width:7.5rem}
+.ref td.m{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+(function(){
+var Q = [{"s":"n","q":"What comes next?  4, 9, 19, 39, ?","o":["69","74","78","79","84"],"a":3,"e":"Each term is double the previous one plus 1. 39 × 2 + 1 = 79."},{"s":"n","q":"What comes next?  2, 6, 12, 20, 30, ?","o":["36","40","42","44","48"],"a":2,"e":"The gaps grow by 2: +4, +6, +8, +10, so the next gap is +12. 30 + 12 = 42."},{"s":"n","q":"What comes next?  1, 1, 2, 3, 5, 8, ?","o":["11","12","13","14","15"],"a":2,"e":"Each term is the sum of the two before it (Fibonacci). 5 + 8 = 13."},{"s":"n","q":"Three pens cost $4.50. At the same price, what do 8 pens cost?","o":["$10.50","$11.00","$12.00","$12.50","$13.50"],"a":2,"e":"One pen is $1.50. 8 × $1.50 = $12.00."},{"s":"n","q":"What is 35% of 240?","o":["72","78","84","90","96"],"a":2,"e":"10% is 24, so 30% is 72 and 5% is 12. 72 + 12 = 84."},{"s":"n","q":"A car travels at 45 mph for 2 hours 40 minutes. How far does it go?","o":["105 miles","110 miles","115 miles","120 miles","135 miles"],"a":3,"e":"2 hours 40 minutes is 2⅔ hours. 45 × 2⅔ = 90 + 30 = 120 miles."},{"s":"n","q":"What is the average of 12, 18, 25, 9 and 31?","o":["17","18","19","20","21"],"a":2,"e":"The sum is 95. 95 ÷ 5 = 19."},{"s":"n","q":"Two numbers are in the ratio 4:7 and add up to 66. What is the larger number?","o":["36","38","40","42","44"],"a":3,"e":"4 + 7 = 11 parts, so one part is 6. The larger number is 7 × 6 = 42."},{"s":"n","q":"A $120 item is raised 20%, then the new price is cut 20%. What is the final price?","o":["$112.00","$115.20","$118.40","$120.00","$124.80"],"a":1,"e":"$120 × 1.20 = $144. Then $144 × 0.80 = $115.20. Up 20% then down 20% never returns to the start."},{"s":"n","q":"6 workers finish a job in 10 days. At the same pace, how many days would 15 workers need?","o":["2","3","4","5","6"],"a":2,"e":"The job is 60 worker-days. 60 ÷ 15 = 4 days."},{"s":"n","q":"What comes next?  100, 91, 82, 73, ?","o":["62","63","64","65","66"],"a":2,"e":"Subtract 9 each time. 73 − 9 = 64."},{"s":"n","q":"What comes next?  2, 3, 5, 9, 17, ?","o":["25","31","33","34","35"],"a":2,"e":"The gaps double: +1, +2, +4, +8, so the next gap is +16. 17 + 16 = 33."},{"s":"n","q":"How much simple interest does $2,000 earn at 6% per year over 3 years?","o":["$300","$340","$360","$380","$400"],"a":2,"e":"$2,000 × 0.06 = $120 per year. 3 × $120 = $360."},{"s":"n","q":"What is 3/4 of 5/6?","o":["2/3","5/8","7/12","3/5","15/16"],"a":1,"e":"Multiply across: 15/24, which reduces to 5/8."},{"s":"n","q":"A recipe uses 2.5 cups of flour for 20 cookies. How many cups are needed for 64 cookies?","o":["6.5","7","7.5","8","8.5"],"a":3,"e":"2.5 ÷ 20 = 0.125 cups per cookie. 0.125 × 64 = 8 cups."},{"s":"n","q":"What comes next?  5, 10, 8, 16, 14, 28, ?","o":["24","26","30","42","56"],"a":1,"e":"The rule alternates: ×2, then −2. After 28 (reached by ×2) comes −2, which gives 26."},{"s":"n","q":"A square has a perimeter of 36. What is its area?","o":["72","81","108","36","144"],"a":1,"e":"Each side is 36 ÷ 4 = 9. Area = 9 × 9 = 81."},{"s":"n","q":"One pipe fills a tank in 6 hours. A drain empties a full tank in 12 hours. With both open, how long to fill the empty tank?","o":["6 hours","9 hours","12 hours","18 hours","24 hours"],"a":2,"e":"Net rate = 1/6 − 1/12 = 1/12 of the tank per hour, so 12 hours."},{"s":"n","q":"Which fraction equals 0.375?","o":["3/5","3/8","5/8","1/3","7/20"],"a":1,"e":"0.375 = 375/1000 = 3/8."},{"s":"n","q":"Three consecutive whole numbers add up to 72. What is the largest?","o":["23","24","25","26","27"],"a":2,"e":"The middle number is 72 ÷ 3 = 24, so the numbers are 23, 24, 25. The largest is 25."},{"s":"v","q":"Doctor is to patient as lawyer is to:","o":["Judge","Client","Court","Trial","Law"],"a":1,"e":"A doctor serves a patient; a lawyer serves a client."},{"s":"v","q":"Which word is the opposite of FRUGAL?","o":["Thrifty","Careful","Modest","Extravagant","Stingy"],"a":3,"e":"Frugal means careful with money. Extravagant means spending freely."},{"s":"v","q":"Which word is closest in meaning to METICULOUS?","o":["Careless","Bold","Precise","Hasty","Vague"],"a":2,"e":"Meticulous means extremely careful about detail, so precise fits best."},{"s":"v","q":"Which word does not belong?","o":["Compliance","Regulation","Statute","Rumor","Mandate"],"a":3,"e":"The other four relate to rules and requirements. A rumor is unverified talk."},{"s":"v","q":"Thermometer is to temperature as odometer is to:","o":["Speed","Fuel","Distance","Engine","Time"],"a":2,"e":"A thermometer measures temperature; an odometer measures distance traveled."},{"s":"v","q":"Which word is closest in meaning to MITIGATE?","o":["Worsen","Ignore","Delay","Announce","Lessen"],"a":4,"e":"To mitigate is to make something less severe."},{"s":"v","q":"Which word is the opposite of TRANSPARENT?","o":["Clear","Visible","Thin","Honest","Opaque"],"a":4,"e":"Transparent means see-through. Opaque blocks the view."},{"s":"v","q":"Brief is to lengthy as rapid is to:","o":["Quick","Hurried","Slow","Steady","Fast"],"a":2,"e":"The first pair are opposites, so you need the opposite of rapid: slow."},{"s":"v","q":"Which word does not belong?","o":["Examine","Overlook","Inspect","Review","Scrutinize"],"a":1,"e":"The other four mean to look at closely. Overlook means to miss or ignore."},{"s":"v","q":"Seed is to tree as egg is to:","o":["Nest","Shell","Feather","Yolk","Bird"],"a":4,"e":"A seed grows into a tree; an egg develops into a bird."},{"s":"v","q":"Which word is closest in meaning to AMBIGUOUS?","o":["Certain","Obvious","Direct","Unclear","Brief"],"a":3,"e":"Ambiguous means open to more than one meaning, so unclear."},{"s":"v","q":"The auditor's report was so ______ that no one questioned its findings.","o":["flimsy","vague","thorough","biased","hasty"],"a":2,"e":"Only a thorough report would leave nobody with questions. The other words would invite doubt."},{"s":"v","q":"Which word is the opposite of SCARCE?","o":["Rare","Limited","Plentiful","Costly","Tiny"],"a":2,"e":"Scarce means in short supply. Plentiful means there is plenty."},{"s":"v","q":"Map is to navigate as recipe is to:","o":["Eat","Taste","Buy","Serve","Cook"],"a":4,"e":"A map guides you in navigating; a recipe guides you in cooking."},{"s":"v","q":"Which word is closest in meaning to PRUDENT?","o":["Reckless","Generous","Cautious","Curious","Eager"],"a":2,"e":"A prudent person acts with care and good judgment, so cautious fits."},{"s":"v","q":"Which word does not belong?","o":["Weekly","Monthly","Rapidly","Annual","Daily"],"a":2,"e":"The others describe how often something happens. Rapidly describes speed."},{"s":"l","q":"Tom is taller than Raj. Raj is taller than Sam. Maria is shorter than Sam. Who is the shortest?","o":["Sam","Raj","Tom","Maria","Cannot be determined"],"a":3,"e":"The order from tallest is Tom, Raj, Sam, Maria."},{"s":"l","q":"All analysts are detail-oriented. Priya is an analyst. Which statement must be true?","o":["Priya is often late","Priya is detail-oriented","All detail-oriented people are analysts","Priya is not an engineer","Nothing can be concluded"],"a":1,"e":"Priya belongs to the group 'analysts', and every analyst is detail-oriented. The reverse (every detail-oriented person is an analyst) does not follow."},{"s":"l","q":"Some auditors are accountants. All accountants are careful. Which statement must be true?","o":["All auditors are careful","No auditors are careful","Some auditors are careful","All careful people are accountants","Some careful people are not auditors"],"a":2,"e":"The auditors who are accountants are careful, so at least some auditors are careful. The other statements go beyond what is given."},{"s":"l","q":"If it rains, the match is cancelled. The match was not cancelled. What follows?","o":["It rained","It did not rain","It may have rained","The match moved indoors","Cannot be determined"],"a":1,"e":"If rain always cancels the match, no cancellation means no rain (contrapositive)."},{"s":"l","q":"A finished before B. B finished before C. D finished after C. E finished before A. Who finished second?","o":["A","B","C","D","E"],"a":0,"e":"The order is E, A, B, C, D, so A is second."},{"s":"l","q":"Today is Wednesday. What day of the week will it be 100 days from now?","o":["Thursday","Friday","Saturday","Sunday","Monday"],"a":1,"e":"100 ÷ 7 leaves a remainder of 2. Two days after Wednesday is Friday."},{"s":"l","q":"In a code, CAT is written 3120. Using the same code, how is DOG written?","o":["4157","41507","4167","4147","41570"],"a":0,"e":"Letters become their alphabet positions: C=3, A=1, T=20 gives 3120. D=4, O=15, G=7 gives 4157."},{"s":"l","q":"What letter comes next?  A, C, F, J, O, ?","o":["S","T","U","V","W"],"a":2,"e":"Letter positions are 1, 3, 6, 10, 15. The gaps grow by 1, so the next gap is 6: 15 + 6 = 21, which is U."},{"s":"l","q":"What is the angle between the hour and minute hands at 4:00?","o":["90°","100°","120°","130°","150°"],"a":2,"e":"The clock face has 12 hours of 30° each. At 4:00 the hands are 4 hours apart: 4 × 30° = 120°."},{"s":"l","q":"If 3 machines make 3 widgets in 3 minutes, how long do 100 machines take to make 100 widgets?","o":["1 minute","3 minutes","30 minutes","33 minutes","100 minutes"],"a":1,"e":"Each machine makes one widget in 3 minutes. 100 machines each make one widget in the same 3 minutes."},{"s":"l","q":"Every report in the folder is approved. Some approved items are late. A report is in the folder. Is it late?","o":["Yes, it is late","No, it is not late","Cannot be determined","It is not approved","Its approval is unknown"],"a":2,"e":"The report is approved, but only some approved items are late. Nothing tells us whether this one is."},{"s":"l","q":"Which number does not belong?  16, 25, 36, 48, 49","o":["16","25","36","48","49"],"a":3,"e":"16, 25, 36 and 49 are perfect squares. 48 is not."},{"s":"l","q":"Ben is 12. Anna is twice as old as Ben. How old was Anna when Ben was born?","o":["6","10","12","18","24"],"a":2,"e":"Anna is 24 now, which is 12 years older than Ben. She was 24 − 12 = 12 when he was born."},{"s":"l","q":"A cube is painted red on all faces, then cut into 27 equal small cubes (3 × 3 × 3). How many small cubes have exactly two red faces?","o":["6","8","12","24","1"],"a":2,"e":"Cubes with two painted faces sit on the edges, excluding corners. A cube has 12 edges, with one such small cube on each."}];
+var SECTIONS = {n:'Numerical', v:'Verbal', l:'Logic'};
+var MODES = {
+  full:{name:'Full test', count:50, secs:900, big:'15:00', sub:'50 questions, about 18 seconds each'},
+  half:{name:'Half test', count:25, secs:450, big:'7:30', sub:'25 questions, same pace as the full test'},
+  free:{name:'Untimed practice', count:50, secs:0, big:'No clock', sub:'50 questions, elapsed time still tracked'}
+};
+var LET = ['A','B','C','D','E'];
+var HKEY = 'ccat-practice-history';
+function $(s){return document.querySelector(s)}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function fmt(sec){sec=Math.max(0,Math.round(sec));var m=Math.floor(sec/60),s=sec%60;return m+':'+(s<10?'0':'')+s}
+function isRight(it){return it.pick!==null && it.opts[it.pick].c}
+function loadHistory(){try{return JSON.parse(localStorage.getItem(HKEY)||'[]')}catch(e){return []}}
+function saveHistory(score){try{var h=loadHistory();h.unshift({d:Date.now(),m:S.mode,s:score,n:S.items.length});localStorage.setItem(HKEY,JSON.stringify(h.slice(0,6)))}catch(e){}}
+
+var S = null, timer = null, ui = {view:'start', tab:'practice', filter:'all', kf:'all', tf:'all', confirm:false, auto:false};
+
+function newAttempt(modeKey){
+  var m = MODES[modeKey], pool = Q.map(function(q){return q});
+  if(m.count < Q.length){
+    var pick = [];
+    ['n','v','l'].forEach(function(s){
+      var g = shuffle(pool.filter(function(q){return q.s===s}));
+      pick = pick.concat(g.slice(0, Math.ceil(g.length/2)));
+    });
+    pool = pick;
+  }
+  var items = shuffle(pool).map(function(q){
+    return {s:q.s, q:q.q, e:q.e, pick:null, flag:false, ms:0,
+      opts:shuffle(q.o.map(function(t,i){return {t:t, c:i===q.a}}))};
+  });
+  var now = Date.now();
+  S = {mode:modeKey, items:items, cur:0, startTs:now, endTs:m.secs?now+m.secs*1000:0, qStart:now, done:false, timeUp:false, usedSec:0};
+  ui.view='test'; ui.tab='practice'; ui.confirm=false;
+  clearInterval(timer); timer=setInterval(tick,250);
+  render(); window.scrollTo(0,0);
+}
+function leave(){S.items[S.cur].ms += Date.now()-S.qStart}
+function go(i){
+  if(i<0||i>=S.items.length)return;
+  leave(); S.cur=i; S.qStart=Date.now(); ui.confirm=false; render();
+}
+function choose(i){
+  var it=S.items[S.cur]; if(i>=it.opts.length)return;
+  it.pick=i;
+  if(ui.auto && S.cur<S.items.length-1) go(S.cur+1); else render();
+}
+function finish(auto){
+  if(S.done)return;
+  leave(); S.done=true; S.timeUp=!!auto;
+  var end = S.endTs ? Math.min(Date.now(), S.endTs) : Date.now();
+  S.usedSec = (end-S.startTs)/1000;
+  clearInterval(timer);
+  saveHistory(S.items.filter(isRight).length);
+  ui.view='results'; ui.filter='all'; ui.confirm=false;
+  render(); window.scrollTo(0,0);
+}
+function tick(){
+  if(!S||S.done)return;
+  var el=$('#clock');
+  if(S.endTs){
+    var r=(S.endTs-Date.now())/1000;
+    if(r<=0){finish(true);return}
+    if(el){el.textContent=fmt(Math.ceil(r)); el.parentElement.classList.toggle('low', r<=120)}
+  } else if(el){ el.textContent=fmt((Date.now()-S.startTs)/1000) }
+}
+
+function renderStart(){
+  var h=loadHistory();
+  var hist = h.length ? '<section class="hist"><h2>Your recent attempts on this device</h2><table><thead><tr><th>Date</th><th>Mode</th><th>Score</th></tr></thead><tbody>'+
+    h.map(function(x){return '<tr><td>'+esc(new Date(x.d).toLocaleDateString(undefined,{month:'short',day:'numeric'}))+'</td><td>'+esc(MODES[x.m]?MODES[x.m].name:x.m)+'</td><td class="mono">'+x.s+' / '+x.n+'</td></tr>'}).join('')+
+    '</tbody></table></section>' : '';
+  return '<div class="hero"><span class="eyebrow">Criteria Cognitive Aptitude Test · practice</span>'+
+    '<h1>CCAT Practice Test</h1>'+
+    '<p class="lede">Fifty original questions in the style of the CCAT: numerical, verbal and logic. Pick a mode, race the clock, then review every answer with a short explanation.</p></div>'+
+    '<div class="modes">'+Object.keys(MODES).map(function(k){var m=MODES[k];return '<button class="mode" data-a="mode" data-m="'+k+'"><span class="big">'+m.big+'</span><span class="name">'+m.name+'</span><span class="sub">'+m.sub+'</span></button>'}).join('')+'</div>'+
+    '<p class="note">Candidate reports differ on the length of the real Coinbase assessment, so treat your invitation email as the source of truth. This set is for building speed, not for predicting a percentile.</p>'+
+    '<div class="tips">'+
+    '<section class="card"><h2>How the real test works</h2><ul>'+
+      '<li>The standard format is <strong>50 multiple-choice questions in 15 minutes</strong>, about 18 seconds each. Each question has five options.</li>'+
+      '<li>Questions mix <strong>math and logic, verbal reasoning and spatial reasoning</strong> (shape patterns). This set covers the first two; practise shape patterns separately.</li>'+
+      '<li>Scoring counts correct answers. Confirm in your instructions that wrong answers carry no penalty, then leave nothing blank.</li>'+
+      '<li>Check whether scratch paper and a calculator are allowed. Practise without a calculator either way, because 18 seconds leaves no time for one.</li>'+
+      '<li>The average raw score is often quoted at about 24 of 50, and employers set their own cut-offs.</li>'+
+    '</ul></section>'+
+    '<section class="card"><h2>Tricks for a higher score</h2><ul>'+
+      '<li><strong>Work in two passes.</strong> Answer what you can in 10 to 15 seconds. Guess, flag and move on from anything that stalls you past 30 seconds, then return if time is left.</li>'+
+      '<li><strong>Never leave a blank.</strong> A blind guess is 1 in 5. Cross out two options and it becomes 1 in 3.</li>'+
+      '<li><strong>Estimate before you calculate.</strong> Round the numbers, then pick the closest option. Last digits often rule out options.</li>'+
+      '<li><strong>Run the same checks on every sequence.</strong> Differences first, then ratios, then alternating rules, then squares and Fibonacci.</li>'+
+      '<li><strong>Turn analogies into a sentence.</strong> Say how the first pair connects, such as "a doctor treats a patient", then apply it to the second pair. For odd one out, name the category first.</li>'+
+      '<li><strong>Read logic literally.</strong> "Some" never means "all". "If A then B" plus "not B" gives "not A", but "B" does not give "A". When the facts leave a gap, "cannot be determined" is often right.</li>'+
+      '<li><strong>Build percentages from 10%, 5% and 1%.</strong> They combine into almost any percentage.</li>'+
+      '<li><strong>Practise under the clock.</strong> Do the full mode two or three times, then use the review to see which section costs you the most time or points.</li>'+
+    '</ul></section></div>'+hist+
+    '<p class="foot">Keyboard shortcuts during the test: A to E or 1 to 5 to answer, N next, P previous, F flag. All 50 questions are original practice items written for this page. They match the style of the CCAT, not its content.</p>';
+}
+
+function renderTest(){
+  var it=S.items[S.cur], n=S.items.length, m=MODES[S.mode];
+  var ans=S.items.filter(function(x){return x.pick!==null}).length;
+  var fl=S.items.filter(function(x){return x.flag}).length;
+  var blank=n-ans;
+  var clockTxt = S.endTs ? fmt(Math.ceil((S.endTs-Date.now())/1000)) : fmt((Date.now()-S.startTs)/1000);
+  var dots = S.items.map(function(x,i){
+    var c=(x.pick!==null?' ans':'')+(x.flag?' fl':'')+(i===S.cur?' cur':'');
+    return '<button class="dot'+c+'" data-a="go" data-i="'+i+'" aria-label="Question '+(i+1)+(x.pick!==null?', answered':', blank')+(x.flag?', flagged':'')+'"'+(i===S.cur?' aria-current="true"':'')+'>'+(i+1)+'</button>';
+  }).join('');
+  var finishBox = ui.confirm ?
+    '<div class="confirm" role="alertdialog" aria-label="Submit test"><p>'+(blank?blank+' unanswered':'All answered')+(fl?', '+fl+' flagged':'')+'. Submit now?</p><div class="row"><button class="btn" data-a="cancel">Keep working</button><button class="btn primary" data-a="submit">Submit</button></div></div>' :
+    '<button class="btn primary wide" data-a="ask">Finish and see score</button>';
+  return '<header class="bar"><div class="bar-in">'+
+      '<div class="qcount"><strong>Question '+(S.cur+1)+'</strong> of '+n+'</div>'+
+      '<div class="prog" role="progressbar" aria-label="Answered" aria-valuemin="0" aria-valuemax="'+n+'" aria-valuenow="'+ans+'"><i style="width:'+(ans/n*100)+'%"></i></div>'+
+      '<div class="clock"><span class="lbl">'+(S.endTs?'Time left':'Elapsed')+'</span><span id="clock" class="mono">'+clockTxt+'</span></div>'+
+    '</div></header>'+
+    '<div class="test-grid">'+
+    '<section class="card qcard"><div class="qmeta"><span class="chip">'+SECTIONS[it.s]+'</span>'+(it.flag?'<span class="chip flag">Flagged</span>':'')+'</div>'+
+      '<h2 class="qtext">'+esc(it.q)+'</h2>'+
+      '<div class="opts" role="radiogroup" aria-label="Answer choices">'+
+        it.opts.map(function(o,i){return '<button class="opt'+(it.pick===i?' sel':'')+'" role="radio" aria-checked="'+(it.pick===i)+'" data-a="pick" data-i="'+i+'"><span class="key">'+LET[i]+'</span><span class="otext">'+esc(o.t)+'</span></button>'}).join('')+
+      '</div>'+
+      '<div class="qnav"><button class="btn" data-a="prev"'+(S.cur===0?' disabled':'')+'>Previous</button>'+
+        '<button class="btn" data-a="flag" aria-pressed="'+it.flag+'">'+(it.flag?'Remove flag':'Flag for later')+'</button><span class="grow"></span>'+
+        (S.cur===n-1?'<button class="btn primary" data-a="ask">Finish</button>':'<button class="btn primary" data-a="next">Next</button>')+
+      '</div></section>'+
+    '<aside class="card side"><h2>Questions</h2><p class="tally">'+ans+' answered · '+fl+' flagged · '+blank+' blank</p>'+
+      '<div class="navgrid">'+dots+'</div>'+
+      '<div class="legend"><span class="l-ans">Answered</span><span class="l-fl">Flagged</span></div>'+
+      '<label class="auto"><input type="checkbox" id="auto"'+(ui.auto?' checked':'')+'> Move on after I answer</label>'+
+      finishBox+
+    '</aside></div>';
+}
+
+function renderResults(){
+  var items=S.items, n=items.length;
+  var correct=items.filter(isRight).length;
+  var blank=items.filter(function(x){return x.pick===null}).length;
+  var wrong=n-correct-blank;
+  var pct=Math.round(correct/n*100);
+  var avg=S.usedSec/n;
+  var secs=['n','v','l'].map(function(k){
+    var g=items.filter(function(x){return x.s===k});
+    var c=g.filter(isRight).length;
+    var t=g.reduce(function(a,x){return a+x.ms},0)/g.length/1000;
+    return {k:k,total:g.length,c:c,t:t,acc:c/g.length};
+  });
+  var weakest=secs.slice().sort(function(a,b){return a.acc-b.acc})[0];
+  var slowest=secs.slice().sort(function(a,b){return b.t-a.t})[0];
+  var pace = avg>18 ? 'You averaged <strong>'+avg.toFixed(0)+' seconds</strong> per question against a target of 18. Skip faster and come back later.' :
+    'You averaged <strong>'+avg.toFixed(0)+' seconds</strong> per question, inside the 18 second target.';
+  var coach = pace+' Accuracy was lowest on <strong>'+SECTIONS[weakest.k].toLowerCase()+'</strong> questions ('+weakest.c+' of '+weakest.total+')'+
+    (slowest.k!==weakest.k?', and you spent the most time per question on <strong>'+SECTIONS[slowest.k].toLowerCase()+'</strong>':'')+'. Aim your next set there.';
+  var f=ui.filter;
+  var counts={all:n,wrong:wrong,blank:blank,flag:items.filter(function(x){return x.flag}).length};
+  var seg=[['all','All'],['wrong','Wrong'],['blank','Blank'],['flag','Flagged']].map(function(p){
+    return '<button data-a="filter" data-f="'+p[0]+'" aria-pressed="'+(f===p[0])+'">'+p[1]+' ('+counts[p[0]]+')</button>';
+  }).join('');
+  var rows=items.map(function(it,i){
+    var ok=isRight(it), bl=it.pick===null;
+    if(f==='wrong' && (ok||bl))return '';
+    if(f==='blank' && !bl)return '';
+    if(f==='flag' && !it.flag)return '';
+    var opts=it.opts.map(function(o,j){
+      var cls=o.c?'ok':(it.pick===j?'bad':'');
+      var mk=o.c?'✓':(it.pick===j?'✗':'');
+      var tag=o.c?(it.pick===j?'Your answer':'Correct'):(it.pick===j?'Your answer':'');
+      return '<div class="'+cls+'"><span class="mk">'+mk+'</span><span>'+esc(o.t)+'</span>'+(tag?'<span class="tag">'+tag+'</span>':'')+'</div>';
+    }).join('');
+    return '<article class="card rv"><div class="rv-top"><span class="st '+(ok?'ok':bl?'blank':'bad')+'">'+(ok?'Correct':bl?'Blank':'Wrong')+'</span>'+
+      '<span class="qn">Question '+(i+1)+' · '+SECTIONS[it.s]+(it.flag?' · flagged':'')+'</span><span class="t mono">'+(it.ms/1000).toFixed(0)+'s</span></div>'+
+      '<p class="q">'+esc(it.q)+'</p><div class="ro">'+opts+'</div><p class="exp"><b>Why:</b> '+esc(it.e)+'</p></article>';
+  }).join('') || '<p class="note">Nothing in this filter.</p>';
+  return (S.timeUp?'<div class="banner" role="status">Time ran out. Your answers so far were scored.</div>':'')+
+    '<span class="eyebrow">'+MODES[S.mode].name+' · results</span>'+
+    '<div class="res-top"><div><div class="score"><span class="num">'+correct+'</span><span class="of">/ '+n+'</span></div><p class="pct">'+pct+'% correct</p></div>'+
+      '<dl class="stats"><div class="stat"><dt>Wrong</dt><dd>'+wrong+'</dd></div><div class="stat"><dt>Blank</dt><dd>'+blank+'</dd></div><div class="stat"><dt>Time used</dt><dd>'+fmt(S.usedSec)+'</dd></div><div class="stat"><dt>Per question</dt><dd>'+avg.toFixed(0)+'s</dd></div></dl></div>'+
+    '<section class="card"><h2 style="font-size:1.15rem;margin-bottom:14px">By section</h2><div class="secs">'+
+      secs.map(function(s){return '<div class="srow"><span class="nm">'+SECTIONS[s.k]+'</span><span class="track"><i style="width:'+(s.acc*100)+'%"></i></span><span class="sc mono">'+s.c+' / '+s.total+'</span><span class="tm mono">'+s.t.toFixed(0)+'s each</span></div>'}).join('')+
+    '</div><p class="coach">'+coach+'</p></section>'+
+    '<div class="res-actions"><button class="btn primary" data-a="retry">Retake '+MODES[S.mode].name.toLowerCase()+'</button><button class="btn" data-a="home">Choose another mode</button></div>'+
+    '<div class="rv-head"><h2>Review every answer</h2><div class="seg">'+seg+'</div></div>'+rows+
+    '<p class="foot">Retaking reshuffles question order and answer positions, so memorising letters will not help. Scores here are not calibrated against the real test.</p>';
+}
+
+/* ---------- answer key ---------- */
+function renderKey(){
+  var f=ui.kf;
+  var cnt={all:Q.length,n:0,v:0,l:0};
+  Q.forEach(function(q){cnt[q.s]++});
+  var seg=[['all','All'],['n','Numerical'],['v','Verbal'],['l','Logic']].map(function(p){
+    return '<button data-a="kfilter" data-f="'+p[0]+'" aria-pressed="'+(f===p[0])+'">'+p[1]+' ('+cnt[p[0]]+')</button>';
+  }).join('');
+  var quick=Q.map(function(q,i){
+    if(f!=='all'&&q.s!==f)return '';
+    return '<li><b>'+(i+1)+'</b><span>'+esc(q.o[q.a])+'</span></li>';
+  }).join('');
+  var rows=Q.map(function(q,i){
+    if(f!=='all'&&q.s!==f)return '';
+    var opts=q.o.map(function(t,j){
+      var ok=j===q.a;
+      return '<div class="'+(ok?'ok':'')+'"><span class="mk">'+(ok?'✓':LET[j])+'</span><span>'+esc(t)+'</span>'+(ok?'<span class="tag">Answer</span>':'')+'</div>';
+    }).join('');
+    return '<article class="card rv"><div class="rv-top"><span class="st ok">Q'+(i+1)+'</span><span class="qn">'+SECTIONS[q.s]+'</span></div>'+
+      '<p class="q">'+esc(q.q)+'</p><div class="ro">'+opts+'</div><p class="exp"><b>Why:</b> '+esc(q.e)+'</p></article>';
+  }).join('');
+  return '<div class="page-head"><span class="eyebrow">Answer key</span><h1>All 50 answers</h1>'+
+    '<p class="lede">Every question with its correct answer and a short explanation. Questions and option letters here stay in a fixed order. The test shuffles both, so match by question text.</p></div>'+
+    '<div class="seg" style="margin-bottom:16px">'+seg+'</div>'+
+    '<h2 style="font-size:1.15rem;margin-bottom:10px">Answers at a glance</h2><ul class="qk" style="margin-bottom:28px">'+quick+'</ul>'+
+    '<h2 style="font-size:1.15rem;margin-bottom:12px">Worked explanations</h2>'+rows;
+}
+
+/* ---------- tips ---------- */
+function table(head,rows,mono){
+  return '<div class="refwrap"><table class="ref"><thead><tr>'+head.map(function(h){return '<th>'+esc(h)+'</th>'}).join('')+'</tr></thead><tbody>'+
+    rows.map(function(r){return '<tr>'+r.map(function(c,i){return '<td'+(mono&&i>0?' class="m"':'')+'>'+esc(c)+'</td>'}).join('')+'</tr>'}).join('')+'</tbody></table></div>';
+}
+var FRAC=[['1/8','0.125','12.5%'],['1/6','0.167','16.7%'],['1/5','0.2','20%'],['1/4','0.25','25%'],['1/3','0.333','33.3%'],['3/8','0.375','37.5%'],['2/5','0.4','40%'],['1/2','0.5','50%'],['5/8','0.625','62.5%'],['2/3','0.667','66.7%'],['3/4','0.75','75%'],['7/8','0.875','87.5%']];
+var SETS=[['Squares','11² = 121 · 12² = 144 · 13² = 169 · 14² = 196 · 15² = 225 · 16² = 256'],['Cubes','2³ = 8 · 3³ = 27 · 4³ = 64 · 5³ = 125 · 6³ = 216'],['Primes','2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31']];
+var ALPHA=[['A–E','1 2 3 4 5'],['F–J','6 7 8 9 10'],['K–O','11 12 13 14 15'],['P–T','16 17 18 19 20'],['U–Z','21 22 23 24 25 26']];
+var VOCAB=[['meticulous','very careful about detail','careless'],['prudent','careful and sensible','reckless'],['frugal','careful with money','extravagant'],['mitigate','make less severe','worsen'],['ambiguous','open to more than one meaning','clear'],['scarce','in short supply','plentiful'],['transparent','see-through, open','opaque'],['candid','frank and honest','evasive'],['diligent','hardworking and careful','lazy'],['concise','brief and clear','wordy'],['obsolete','out of date','current'],['scrutinize','examine closely','overlook'],['discrepancy','a mismatch between things','agreement'],['mandatory','required','optional'],['compliance','following the rules','violation'],['pragmatic','practical','idealistic'],['negligent','failing to take care','attentive'],['reluctant','unwilling','eager'],['verify','confirm as true','dispute'],['hinder','slow down or block','help']];
+var FORM=[
+ ['Average (mean)','sum ÷ count','12, 18, 25, 9, 31: 95 ÷ 5 = 19'],
+ ['Sum from an average','average × count','Average 19 over 5 numbers: 19 × 5 = 95'],
+ ['Score needed for a target average','target × count − current total','Scores 80, 90, 70 and you want 85 over 4 tests: 85 × 4 = 340, then 340 − 240 = 100'],
+ ['Median','middle value of the sorted list (average the middle two if the count is even)','3, 5, 5, 8, 9: median is 5'],
+ ['Mode and range','mode = most frequent value; range = largest − smallest','3, 5, 5, 8, 9: mode 5, range 6'],
+ ['Simple interest','I = P × r × t (rate as a decimal, time in years)','$2,000 at 6% for 3 years: 2,000 × 0.06 × 3 = $360'],
+ ['Total after interest','P + I','2,000 + 360 = $2,360'],
+ ['Percent of a number','number × percent ÷ 100','35% of 240 = 240 × 0.35 = 84'],
+ ['Percent change','(new − old) ÷ old × 100','80 to 100: 20 ÷ 80 = 25% increase'],
+ ['Distance, speed, time','d = s × t, s = d ÷ t, t = d ÷ s','150 miles in 2.5 hours: 150 ÷ 2.5 = 60 mph'],
+ ['Ratio share','total ÷ sum of parts × your part','4:7 totalling 66: 66 ÷ 11 × 7 = 42'],
+ ['Unit price','total cost ÷ number of items','3 pens for $4.50: $4.50 ÷ 3 = $1.50'],
+ ['Square and rectangle','square: P = 4s, A = s²; rectangle: P = 2(l + w), A = l × w','Square with perimeter 36: s = 9, area 81'],
+ ['Circle','A = πr², C = 2πr (π ≈ 3.14)','r = 5: area ≈ 78.5, circumference ≈ 31.4']
+];
+var TIMEC=[['5 min','1/12 h','0.083'],['10 min','1/6 h','0.167'],['12 min','1/5 h','0.2'],['15 min','1/4 h','0.25'],['20 min','1/3 h','0.333'],['30 min','1/2 h','0.5'],['40 min','2/3 h','0.667'],['45 min','3/4 h','0.75'],['50 min','5/6 h','0.833'],['60 min','1 h','1']];
+var TIMEM=[['1 h 20 min','1⅓ h = 4/3 h'],['2 h 15 min','2¼ h = 9/4 h'],['2 h 40 min','2⅔ h = 8/3 h'],['3 h 45 min','3¾ h = 15/4 h']];
+var WORK=[
+ ['Same pace, different crew','Worker-days stay constant: workers × days = total. Divide the total by the new crew size.','6 workers take 10 days, so the job is 60 worker-days. 15 workers: 60 ÷ 15 = 4 days.'],
+ ['Working together','Turn each time into a rate (1 ÷ time) and add the rates. Total time = 1 ÷ combined rate. Shortcut for two people: (A × B) ÷ (A + B).','A takes 6 h, B takes 3 h. 1/6 + 1/3 = 1/2 per hour, so 2 hours. Shortcut: (6 × 3) ÷ (6 + 3) = 2.'],
+ ['Fill and drain','Add the filling rates and subtract the draining rates.','Fills in 6 h, drains in 12 h: 1/6 − 1/12 = 1/12 per hour, so 12 hours.'],
+ ['Part of a job done','Work done = rate × time. Work left = 1 − work done.','A does the job alone in 8 h. After 2 hours: 2 × 1/8 = 1/4 done, so 3/4 is left.'],
+ ['Finding the missing person','Subtract the known rate from the combined rate.','A and B together take 4 h; A alone takes 6 h. 1/4 − 1/6 = 1/12, so B alone takes 12 h.']
+];
+var TIPS=[
+ {k:'m',title:'Math and number patterns',groups:[
+  {h:'Percentages and fractions',items:[
+   "Build percentages from 10%, 5% and 1%. For 35% of 240: 30% is 72, 5% is 12, total 84.",
+   "Shortcuts: 50% is ÷2, 25% is ÷4, 12.5% is ÷8, 33⅓% is ÷3.",
+   "Successive changes multiply, they do not cancel. +20% then −20% is 1.2 × 0.8 = 0.96, a 4% net drop.",
+   "Percent change = change ÷ the starting value. Always divide by where you started.",
+   "Treat a discount as a multiplier: 25% off is × 0.75."]},
+  {h:'Ratios, rates and work',items:[
+   "Ratios: add the parts, divide the total by that, then multiply. 4:7 totalling 66 is 11 parts of 6, so the larger is 42.",
+   "Distance = speed × time. Convert minutes first: 40 min is ⅔ hour, 15 min is ¼ hour.",
+   "Work problems keep worker-days constant. 6 workers × 10 days = 60 = 15 workers × 4 days.",
+   "Rates are 1 ÷ time and they add. A pipe filling in 6 hours and a drain emptying in 12 hours give 1/6 − 1/12 = 1/12 per hour.",
+   "For scaling (recipes, prices) find the amount for one unit first, then multiply.",
+   "Average = sum ÷ count, so sum = average × count. Simple interest = principal × rate × years."]},
+  {h:'Number sequences: check in this order',items:[
+   "Constant gap (+9, −9).",
+   "Gaps that grow steadily (+4, +6, +8) or double (+1, +2, +4, +8).",
+   "Double or multiply, then add or subtract a constant (× 2 + 1).",
+   "Two rules alternating (× 2, − 2, × 2, − 2). Compare every other term.",
+   "Special sets: squares, cubes, Fibonacci, primes.",
+   "Stuck after about 20 seconds? Flag it and move on. Sequences are the easiest place to lose a minute."]},
+  {h:'Quick checks',items:[
+   "Divisible by 3 if the digits add to a multiple of 3, by 9 if they add to a multiple of 9, by 5 if the number ends in 0 or 5.",
+   "Check the last digit of your answer against the options before finishing the arithmetic.",
+   "Square: perimeter = 4 × side, area = side². Circle: area = πr², circumference = 2πr.",
+   "Consecutive numbers: the middle one is the sum ÷ how many there are."]}
+ ],tables:function(){return ''+
+   '<h3>Formula cheat sheet</h3>'+table(['Quantity','Formula','Example'],FORM,false)+
+   '<h3 style="margin-top:22px">Minutes to hours</h3><p class="note" style="margin-bottom:8px">Minutes to hours: divide by 60 and reduce (40 ÷ 60 = 2/3). Hours to minutes: multiply by 60 (0.25 h × 60 = 15 min). Seconds to minutes: divide by 60.</p>'+
+   table(['Minutes','As a fraction of an hour','Decimal'],TIMEC,true)+
+   '<div style="height:10px"></div>'+table(['Mixed time','Hours'],TIMEM,false)+
+   '<h3 style="margin-top:22px">Work problems, step by step</h3><p class="note" style="margin-bottom:8px">Treat the whole job as 1. A person who finishes in t hours works at a rate of 1 ÷ t of the job per hour. Add or subtract rates, then time = 1 ÷ rate.</p>'+
+   table(['Type','Method','Example'],WORK,false)+
+   '<h3 style="margin-top:22px">Fractions, decimals and percentages</h3>'+table(['Fraction','Decimal','Percent'],FRAC,true)+
+   '<h3 style="margin-top:22px">Numbers worth knowing</h3>'+table(['Set','Values'],SETS,true)}},
+ {k:'l',title:'Logic and reasoning',groups:[
+  {h:'Ordering and ranking',items:[
+   "Write each fact as A > B and chain them into one line. Tom > Raj > Sam > Maria answers who is tallest, shortest or second.",
+   "For finish orders, draw numbered slots and place the fixed facts first.",
+   "Re-read the question word: tallest or shortest, first or last, before or after."]},
+  {h:'If-then and all/some statements',items:[
+   "If P then Q. Valid: not Q means not P. Invalid: Q means P, and not P means not Q.",
+   "All A are B does not mean all B are A.",
+   "Some means at least one. It never lets you say all.",
+   "Test a conclusion by asking whether you can imagine the facts being true and the conclusion false. If you can, the answer is cannot be determined.",
+   "Chain the groups: some auditors are accountants, all accountants are careful, so some auditors are careful.",
+   "Sketch circles for all, some and none statements."]},
+  {h:'Codes and letters',items:[
+   "Convert letters to alphabet positions: A = 1 up to Z = 26.",
+   "For a letter sequence, write the positions and look at the gaps. Gaps that grow by 1 are common (A, C, F, J, O).",
+   "Look for a constant shift (each letter + 2) or a reversal when positions do not fit.",
+   "Give the answer in the same format as the example (3120 means 3, 1, 20, so DOG is 4157)."]},
+  {h:'Clocks, calendars and ages',items:[
+   "Clock: 30° per hour, 6° per minute. The hour hand also moves 0.5° each minute.",
+   "Calendar: divide the days by 7 and use the remainder. 100 days is 14 weeks and 2 days.",
+   "Age gaps never change. If Anna is 12 years older than Ben now, she was 12 years older when he was born."]},
+  {h:'Trick questions and spatial',items:[
+   "Rate riddles: find the rate for a single item first. 3 machines make 3 widgets in 3 minutes means one machine makes a widget in 3 minutes, so 100 machines make 100 in 3 minutes.",
+   "Painted cube cut into n × n × n: corners 8 (three faces), edges 12 × (n − 2) (two faces), face centres 6 × (n − 2)² (one face), inside (n − 2)³ (none). For 3 × 3 × 3 that is 8, 12, 6, 1.",
+   "Odd one out in numbers: test squares, primes, odd or even, and multiples.",
+   "Shape patterns (not in this set): follow one change at a time across a row, such as rotation, shading or count."]}
+ ],tables:function(){return '<h3>Alphabet positions</h3>'+table(['Letters','Positions'],ALPHA,true)}},
+ {k:'v',title:'Verbal reasoning',groups:[
+  {h:'Analogies',items:[
+   "Say the link as a sentence, such as a doctor treats a patient, then test every option in the same sentence.",
+   "Keep the order. Doctor to patient is worker to person served, so lawyer goes with client, not judge.",
+   "Common links: opposite, synonym, part to whole, tool to what it measures (odometer, distance), cause to effect, degree (warm, hot), category to member, grows into (seed, tree).",
+   "If two options fit, make your sentence more specific."]},
+  {h:'Odd one out',items:[
+   "Name the category that fits four of the five words, then pick the outsider.",
+   "Look for a different part of speech (an adverb among nouns), an opposite meaning, or a different level of the same idea."]},
+  {h:'Synonyms and antonyms',items:[
+   "Re-read the stem. Does it ask for the closest meaning or the opposite? The wrong-direction word is usually offered as a trap.",
+   "Use tone. If the word is positive, rule out options that are negative.",
+   "Word parts help: un-, in-, im-, non- (not); mis-, mal- (bad); bene- (good); pre- (before); post- (after); trans- (across); -less (without); -ous (full of).",
+   "Put the word in a sentence you have heard it in, then swap in each option."]},
+  {h:'Sentence completion',items:[
+   "Predict a word before you read the options.",
+   "Clue words matter. So … that, because and therefore keep the direction. But, although, despite and however flip it.",
+   "Read the full sentence back with your choice to check it still makes sense."]}
+ ],tables:function(){return '<h3>Words worth knowing</h3>'+table(['Word','Means','Opposite'],VOCAB,false)}}
+];
+function renderTips(){
+  var f=ui.tf;
+  var seg=[['all','All'],['m','Math'],['l','Logic'],['v','Verbal']].map(function(p){
+    return '<button data-a="tfilter" data-f="'+p[0]+'" aria-pressed="'+(f===p[0])+'">'+p[1]+'</button>';
+  }).join('');
+  var secs=TIPS.map(function(t){
+    if(f!=='all'&&t.k!==f)return '';
+    return '<section class="card tipsec"><h2>'+t.title+'</h2><div class="tipgrid">'+
+      t.groups.map(function(g){return '<div><h3>'+g.h+'</h3><ul>'+g.items.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul></div>'}).join('')+
+      '</div><div>'+t.tables()+'</div></section>';
+  }).join('');
+  return '<div class="page-head"><span class="eyebrow">Tips to remember</span><h1>Math, logic and verbal</h1>'+
+    '<p class="lede">Short rules and reference tables to learn before the test. Skim the section where you lost the most points in your last practice run.</p></div>'+
+    '<div class="seg" style="margin-bottom:18px">'+seg+'</div>'+secs;
+}
+function renderTabs(){
+  return '<nav class="tabs" aria-label="Sections">'+[['practice','Practice test'],['key','Answer key'],['tips','Tips']].map(function(t){
+    return '<button data-a="tab" data-t="'+t[0]+'"'+(ui.tab===t[0]?' aria-current="page"':'')+'>'+t[1]+'</button>';
+  }).join('')+'</nav>';
+}
+
+function render(){
+  var app=$('#app');
+  if(ui.view==='test'){app.innerHTML=renderTest();return}
+  var body = ui.tab==='key' ? renderKey() : ui.tab==='tips' ? renderTips() : (ui.view==='results' ? renderResults() : renderStart());
+  app.innerHTML = renderTabs()+body;
+}
+
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-a]'); if(!b)return;
+  var a=b.dataset.a, i=+b.dataset.i;
+  if(a==='mode'){newAttempt(b.dataset.m)}
+  else if(a==='tab'){ui.tab=b.dataset.t;render();window.scrollTo(0,0)}
+  else if(a==='kfilter'){ui.kf=b.dataset.f;render()}
+  else if(a==='tfilter'){ui.tf=b.dataset.f;render()}
+  else if(a==='home'){ui.view='start';ui.tab='practice';render();window.scrollTo(0,0)}
+  else if(a==='retry'){newAttempt(S.mode)}
+  else if(a==='filter'){ui.filter=b.dataset.f;render()}
+  else if(!S||S.done){return}
+  else if(a==='pick'){choose(i)}
+  else if(a==='next'){go(S.cur+1)}
+  else if(a==='prev'){go(S.cur-1)}
+  else if(a==='go'){go(i)}
+  else if(a==='flag'){S.items[S.cur].flag=!S.items[S.cur].flag;render()}
+  else if(a==='ask'){ui.confirm=true;render()}
+  else if(a==='cancel'){ui.confirm=false;render()}
+  else if(a==='submit'){finish(false)}
+});
+document.addEventListener('change',function(e){
+  if(e.target&&e.target.id==='auto'){ui.auto=e.target.checked}
+});
+document.addEventListener('keydown',function(e){
+  if(ui.view!=='test'||!S||S.done||ui.confirm||e.ctrlKey||e.metaKey||e.altKey)return;
+  var k=e.key.toLowerCase();
+  if(k.length===1 && '12345'.indexOf(k)>-1){choose(+k-1);return}
+  if(k.length===1 && 'abcde'.indexOf(k)>-1){choose('abcde'.indexOf(k));return}
+  if(k==='n'||k==='arrowright'){go(S.cur+1)}
+  else if(k==='p'||k==='arrowleft'){go(S.cur-1)}
+  else if(k==='f'){S.items[S.cur].flag=!S.items[S.cur].flag;render()}
+});
+
+render();
+})();
+</script>
+</body>
+</html>
